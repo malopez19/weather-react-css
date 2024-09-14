@@ -56,13 +56,15 @@ export default function Form({ fetchWeather } : FormProps) {
                 <label htmlFor="country">Pais:</label>
                 <select
                     id="country"
+                    className={style.option}
                     name="country"
                     value={search.country}
                     onChange={handleChange}
                 >
                     <option>-- Seleccione un pais --</option>
                     {countries.map(country => (
-                        <option 
+                        <option
+                            className={style.option}
                             key={country.code} 
                             value={country.code}
                         >
