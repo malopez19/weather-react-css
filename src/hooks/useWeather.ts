@@ -1,7 +1,8 @@
 import axios from "axios"
-import { object, string, number, InferOutput, parse } from "valibot"
+//import { object, string, number, InferOutput, parse } from "valibot"
 import { SearchType, Weather } from "../types"
-//import { z } from "zod"
+import { z } from "zod"
+import { useMemo, useState } from "react"
 
 //type guard
 /* function isWeatherResponse(weather: unknown): weather is Weather{
@@ -16,7 +17,7 @@ import { SearchType, Weather } from "../types"
 } */
 
 //zod
-/* const WeatherSchema = z.object({
+const WeatherSchema = z.object({
     name: z.string(),
     main: z.object({
         temp: z.number(),
@@ -24,9 +25,10 @@ import { SearchType, Weather } from "../types"
         temp_min: z.number(),
     })    
 })
-type Weather = z.infer<typeof WeatherSchema> */
+export type Weather = z.infer<typeof WeatherSchema>
 
 //valibot
+/* 
 const WeatherSchema = object({
     name: string(),
     main: object({
@@ -35,9 +37,18 @@ const WeatherSchema = object({
         temp_min: number(),
     })
 })
-type Weather = InferOutput<typeof WeatherSchema>
+type Weather = InferOutput<typeof WeatherSchema> */
 
 export default function useWeather() {
+
+    const [weather, setWeather] = useState<Weather>({
+        name: '',
+        main: {
+            temp: 0,
+            temp_max: 0,
+            temp_min: 0
+        }
+    })
 
     const fetchWeather = async (search: SearchType) => {
 
@@ -63,29 +74,30 @@ export default function useWeather() {
             } */
 
             //ZOD
-            /* const { data:  weatherData } = await axios.get(weatherUrl)
+            const { data:  weatherData } = await axios.get(weatherUrl)
             const result = WeatherSchema.safeParse(weatherData)
             if(result.success){
-                console.log(result.data.name)
-                console.log(result.data.main.temp)
-            }else{
-                console.log('Respuesta mal formada')
-            } */
+                setWeather(result.data)
+            }
 
             //VALIBOT
-            const { data:  weatherData } = await axios.get(weatherUrl)
+            /* const { data:  weatherData } = await axios.get(weatherUrl)
             const result = parse(WeatherSchema ,weatherData)
             if(result){
                 console.log(result.name)
                 console.log(result.main.temp)
-            }
+            } */
 
         } catch (error) {
             console.error(error)
         }
     }
 
+    const hasWeatherData = useMemo(() => weather.name, [weather])
+
     return {
-        fetchWeather
+        weather,
+        fetchWeather,
+        hasWeatherData
     }   
 }
